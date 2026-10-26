@@ -27,21 +27,15 @@ jobs:
     - name: Checkout
       uses: actions/checkout@main
 
-    - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@main
-      with:
-        # this might remove tools that are actually needed,
-        # if set to "true" but frees about 6 GB
-        tool-cache: true
-        
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        docker-images: true
-        swap-storage: true
+    - name: Free Disk Space (Shell Deep)
+      run: |
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq purge azure-cli ghc* zulu* llvm* firefox google-chrome* dotnet* powershell openjdk* mysql* php* mongodb* snapd --fix-missing
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/ /usr/local/share/boost
+        sudo docker image prune -a -f
+        sudo apt-get -qq autoremove --purge
+        sudo apt-get -qq clean
+        echo "清理后磁盘空间：" && df -hT
 
     - name: Initialization environment
       env:
